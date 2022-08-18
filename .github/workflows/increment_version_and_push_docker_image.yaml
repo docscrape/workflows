@@ -82,5 +82,4 @@ jobs:
         with:
           push: false
           tags: ghcr.io/docscrape/post_search_engine:${{ needs.increase_version.outputs.new_version }}
-          # ssh: default
-          ssh: ""
+          ssh: ${{ inputs.ssh-required && 'default' || '' }}

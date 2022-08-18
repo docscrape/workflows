@@ -1,0 +1,17 @@
+name: Deploy docscrape chart
+
+on:
+  workflow_dispatch:
+    # inputs:
+      
+  
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "kiss my"
+    # get docscrape chart code
+    # set images to values.yaml
+    # commit values.yaml back to chart repo
+    # set configs & secrets from deploy environment to values.yaml
+    # install chart with helm

@@ -79,16 +79,8 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push docker image (tag ${{ needs.increase_version.outputs.new_version }})
-        if: ${{ !inputs.ssh-required }}
         uses: docker/build-push-action@v2.7.0
         with:
           push: true
           tags: ghcr.io/docscrape/${{ github.event.repository.name }}:${{ needs.increase_version.outputs.new_version }}
-
-      - name: Build and push docker image with shh (tag ${{ needs.increase_version.outputs.new_version }})
-        if: inputs.ssh-required
-        uses: docker/build-push-action@v2.7.0
-        with:
-          push: true
-          tags: ghcr.io/docscrape/${{ github.event.repository.name }}:${{ needs.increase_version.outputs.new_version }}
-          ssh: default
+          ssh: ${{ inputs.ssh-required && 'default' || '' }}

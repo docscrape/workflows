@@ -81,6 +81,6 @@ jobs:
       - name: Build and push docker image (tag ${{ needs.increase_version.outputs.new_version }})
         uses: docker/build-push-action@v2.7.0
         with:
-          push: false
+          push: true
           tags: ghcr.io/docscrape/post_search_engine:${{ needs.increase_version.outputs.new_version }}
           ssh: ${{ inputs.ssh-required && 'default' || '' }}

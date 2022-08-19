@@ -12,13 +12,13 @@ on:
           The repo that triggered deploy.
           It also is an image
         type: string
-        required: true
-        default: post_search_engine
+        required: false
+        default: "post_search_engine"
       tag:
         description: "The image tag"
         type: string
-        required: true
-        default: 0.1.7
+        required: false
+        default: "0.1.7"
 
 
 jobs:

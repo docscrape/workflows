@@ -47,13 +47,11 @@ jobs:
         uses: WyriHaximus/github-action-helm3@v2
         with:
           kubeconfig: '${{ secrets.KUBECONFIG_FILE }}'
-          exec: |
-            helm upgrade ${{ github.repository_owner }} . --install --wait --atomic --namespace=test --set=app.name=${{ github.repository_owner }} |
+          exec: >
+            helm upgrade ${{ github.repository_owner }} . --install --wait --atomic --namespace=test --set=app.name=${{ github.repository_owner }}
             --set dockerconfigjson=${{ secrets.DOCKERCONFIGJSON }}
-
             --set post_search_engine.vk_login=${{ secrets.POST_SEARCH_ENGINE_VK_LOGIN }}
             --set post_search_engine.vk_password=${{ secrets.POST_SEARCH_ENGINE_VK_PASSWORD }}
-
             --set account_finder.fc_login=${{ secrets.FC_LOGIN }}
             --set account_finder.fc_password=${{ secrets.FC_PASSWORD }}
             --set seller.vk_login=${{ secrets.SELLER_VK_LOGIN }}

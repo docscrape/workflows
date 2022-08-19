@@ -19,6 +19,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
+      - run: echo ${{ github.event.repository.name }}
       - name: Check out docscrape chart
         uses: actions/checkout@master
         with:

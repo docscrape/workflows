@@ -18,7 +18,7 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    environment: production
+    environment: prod
     steps:
       - name: Check out docscrape chart
         uses: actions/checkout@master

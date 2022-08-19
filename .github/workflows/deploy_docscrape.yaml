@@ -42,37 +42,23 @@ jobs:
       #     github_token: ${{ secrets.DEPLOY_PAT }}
       #     branch: master
 
-      - run: echo ${{ secrets.VK_ID_TO_SEND_DEBUG_REPORTS_TO }}
+      - name: Deploy
+        uses: WyriHaximus/github-action-helm3@v2
+        with:
+          kubeconfig: '${{ secrets.KUBECONFIG_FILE }}'
+          exec: |
+            helm upgrade ${{ github.repository_owner }} . --install --wait --atomic --namespace=test --set=app.name=${{ github.repository_owner }} |
+            --set dockerconfigjson=${{ secrets.DOCKERCONFIGJSON }}
 
-      # - name: Deploy
-      #   uses: deliverybot/helm@master
-      #   with:
-      #     release: docscrape
-      #     namespace: test
-      #     chart: docscrape_chart
-      #     token: ${{ github.token }}
-      #     values: |
-      #       dockerconfigjson: ${{ secrets.DOCKERCONFIGJSON }}
+            --set post_search_engine.vk_login=${{ secrets.POST_SEARCH_ENGINE_VK_LOGIN }}
+            --set post_search_engine.vk_password=${{ secrets.POST_SEARCH_ENGINE_VK_PASSWORD }}
 
-      #       post_search_engine.vk_login: ${{ secrets.POST_SEARCH_ENGINE_VK_LOGIN }}
-      #       post_search_engine.vk_password: ${{ secrets.POST_SEARCH_ENGINE_VK_PASSWORD }}
+            --set account_finder.fc_login=${{ secrets.FC_LOGIN }}
+            --set account_finder.fc_password=${{ secrets.FC_PASSWORD }}
+            --set seller.vk_login=${{ secrets.SELLER_VK_LOGIN }}
+            --set seller.vk_password=${{ secrets.SELLER_VK_PASSWORD }}
+            --set seller.vk_id_to_send_debug_reports_to=${{ secrets.VK_ID_TO_SEND_DEBUG_REPORTS_TO }}
+            --set seller.billing_number=${{ secrets.BILLING_NUMBER }}
+            --set seller.dev_mode="true"
 
-      #       account_finder.fc_login: ${{ secrets.FC_LOGIN }}
-      #       account_finder.fc_password: ${{ secrets.FC_PASSWORD }}
-
-      #       seller.vk_login: ${{ secrets.SELLER_VK_LOGIN }}
-      #       seller.vk_password: ${{ secrets.SELLER_VK_PASSWORD }}
-      #       seller.vk_id_to_send_debug_reports_to: ${{ secrets.VK_ID_TO_SEND_DEBUG_REPORTS_TO }}
-      #       seller.billing_number: ${{ secrets.BILLING_NUMBER }}
-      #       seller.dev_mode: "true"
-
-      #     value-files: "values.yaml"
-      #     # value-files: >-
-      #     # [
-      #     #   "values.yaml", 
-      #     #   "values.production.yaml"
-      #     # ]
-
-      #   env:
-      #     KUBECONFIG_FILE: '${{ secrets.KUBECONFIG_FILE }}'
  

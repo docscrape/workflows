@@ -1,10 +1,6 @@
 name: Deploy docscrape chart
 
 on:
-  push:
-    branches:
-      - "deploy"
-
   workflow_dispatch:
     inputs:
       triggered_repo:
@@ -12,13 +8,11 @@ on:
           The repo that triggered deploy.
           It also is an image
         type: string
-        required: false
-        default: "post_search_engine"
+        required: true
       tag:
         description: "The image tag"
         type: string
-        required: false
-        default: "0.1.7"
+        required: true
 
 
 jobs:

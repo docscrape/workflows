@@ -19,17 +19,27 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - run: echo ${{ github.event.repository.name }}
       - name: Check out docscrape chart
         uses: actions/checkout@master
         with:
           repository: ${{ github.repository_owner }}/docscrape_chart
           token: ${{ secrets.DEPLOY_PAT }}
+      - run: git pull
 
       - name: Update ${{ inputs.triggered_repo }} image tag in docscrape chart
         run: |
           sed -i '/^${{ inputs.triggered_repo }}:/{n;s/image:.*/image: ghcr.io\/docscrape\/${{ inputs.triggered_repo }}:${{ inputs.tag }}/;}' values.yaml
-      
+
+          git config --global user.email `git log -n 1 --pretty=format:%ae`
+          git config --global user.name `git log -n 1 --pretty=format:%an`
+          git commit values.yaml -m "Update ${{ inputs.triggered_repo }} tag to ${{ inputs.tag }}"
+
+      # - name: "Push chart with updated ${{ inputs.triggered_repo }} with tag: ${{ inputs.tag }}"
+      #   uses: ad-m/github-push-action@master
+      #   with:
+      #     github_token: ${{ secrets.DEPLOY_PAT }}
+      #     branch: master
+
       - run: cat values.yaml
 
     # set images to values.yaml

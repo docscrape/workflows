@@ -43,7 +43,7 @@ jobs:
       #     branch: master
 
       - name: Deploy
-        uses: deliverybot/helm@v1
+        uses: deliverybot/helm@master
         with:
           release: docscrape
           namespace: test

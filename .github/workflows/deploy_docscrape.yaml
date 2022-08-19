@@ -42,34 +42,37 @@ jobs:
       #     github_token: ${{ secrets.DEPLOY_PAT }}
       #     branch: master
 
-      - name: Deploy
-        uses: deliverybot/helm@master
-        with:
-          release: docscrape
-          namespace: test
-          chart: docscrape_chart
-          token: ${{ github.token }}
-          values: |
-            dockerconfigjson: ${{ secrets.DOCKERCONFIGJSON }}
+      - run: echo ${{ secrets.VK_ID_TO_SEND_DEBUG_REPORTS_TO }}
 
-            post_search_engine.vk_login: ${{ secrets.POST_SEARCH_ENGINE_VK_LOGIN }}
-            post_search_engine.vk_password: ${{ secrets.POST_SEARCH_ENGINE_VK_PASSWORD }}
+      # - name: Deploy
+      #   uses: deliverybot/helm@master
+      #   with:
+      #     release: docscrape
+      #     namespace: test
+      #     chart: docscrape_chart
+      #     token: ${{ github.token }}
+      #     values: |
+      #       dockerconfigjson: ${{ secrets.DOCKERCONFIGJSON }}
 
-            account_finder.fc_login: ${{ secrets.FC_LOGIN }}
-            account_finder.fc_password: ${{ secrets.FC_PASSWORD }}
+      #       post_search_engine.vk_login: ${{ secrets.POST_SEARCH_ENGINE_VK_LOGIN }}
+      #       post_search_engine.vk_password: ${{ secrets.POST_SEARCH_ENGINE_VK_PASSWORD }}
 
-            seller.vk_login: ${{ secrets.SELLER_VK_LOGIN }}
-            seller.vk_password: ${{ secrets.SELLER_VK_PASSWORD }}
-            seller.vk_id_to_send_debug_reports_to: ${{ secrets.VK_ID_TO_SEND_DEBUG_REPORTS_TO }}
-            seller.billing_number: ${{ secrets.BILLING_NUMBER }}
-            seller.dev_mode: "true"
+      #       account_finder.fc_login: ${{ secrets.FC_LOGIN }}
+      #       account_finder.fc_password: ${{ secrets.FC_PASSWORD }}
 
-          value-files: "values.yaml"
-        env:
-          KUBECONFIG_FILE: '${{ secrets.KUBECONFIG_FILE }}'
+      #       seller.vk_login: ${{ secrets.SELLER_VK_LOGIN }}
+      #       seller.vk_password: ${{ secrets.SELLER_VK_PASSWORD }}
+      #       seller.vk_id_to_send_debug_reports_to: ${{ secrets.VK_ID_TO_SEND_DEBUG_REPORTS_TO }}
+      #       seller.billing_number: ${{ secrets.BILLING_NUMBER }}
+      #       seller.dev_mode: "true"
+
+      #     value-files: "values.yaml"
+      #     # value-files: >-
+      #     # [
+      #     #   "values.yaml", 
+      #     #   "values.production.yaml"
+      #     # ]
+
+      #   env:
+      #     KUBECONFIG_FILE: '${{ secrets.KUBECONFIG_FILE }}'
  
-
-    # set images to values.yaml
-    # commit values.yaml back to chart repo
-    # set configs & secrets from deploy environment to values.yaml
-    # install chart with helm

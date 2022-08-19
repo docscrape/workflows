@@ -35,6 +35,7 @@ jobs:
       - name: Update ${{ inputs.triggered_repo }} image tag in docscrape chart
         run: |
           sed -i '/^${{ inputs.triggered_repo }}:/{n;s/image:.*/image: ghcr.io\/docscrape\/${{ inputs.triggered_repo }}:${{ inputs.tag }}/;}' values.yaml
+          cat values.yaml
 
           git config --global user.email `git log -n 1 --pretty=format:%ae`
           git config --global user.name `git log -n 1 --pretty=format:%an`

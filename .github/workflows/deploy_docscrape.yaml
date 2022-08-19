@@ -13,7 +13,17 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - run: echo ${{ inputs.trigger_repo }}
+      - run: ls
+
+      - name: Check out docscrape chart
+        uses: actions/checkout@master
+        with:
+          repository: ${{ github.repository_owner }}/docscrape_chart
+          token: ${{ secrets.DEPLOY_PAT }}
+
+      - run: ls
+        
+      # - run: echo ${{ inputs.trigger_repo }}
     # get docscrape chart code
     # set images to values.yaml
     # commit values.yaml back to chart repo

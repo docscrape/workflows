@@ -3,8 +3,14 @@ name: Deploy docscrape chart
 on:
   workflow_dispatch:
     inputs:
-      trigger_repo:
-        description: "The repo that triggered deploy"
+      triggered_repo:
+        description: |
+          The repo that triggered deploy.
+          It also is an image
+        type: string
+        required: true
+      tag:
+        description: "The image tag"
         type: string
         required: true
 
@@ -13,18 +19,18 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - run: ls
-
       - name: Check out docscrape chart
         uses: actions/checkout@master
         with:
           repository: ${{ github.repository_owner }}/docscrape_chart
           token: ${{ secrets.DEPLOY_PAT }}
 
-      - run: ls
-        
-      # - run: echo ${{ inputs.trigger_repo }}
-    # get docscrape chart code
+      - name: Update ${{ inputs.triggered_repo }} image tag in docscrape chart
+        run: |
+          sed -i '/^${{ inputs.triggered_repo }}:/{n;s/image:.*/image: "${{ inputs.triggered_repo }}:${{ inputs.tag }}"/;}' values.yaml
+      
+      - run: cat values.yaml
+
     # set images to values.yaml
     # commit values.yaml back to chart repo
     # set configs & secrets from deploy environment to values.yaml

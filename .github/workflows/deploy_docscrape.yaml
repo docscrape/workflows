@@ -2,14 +2,18 @@ name: Deploy docscrape chart
 
 on:
   workflow_dispatch:
-    # inputs:
-      
-  
+    inputs:
+      trigger_repo:
+        description: "The repo that triggered deploy"
+        type: string
+        required: true
+
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - run: echo "kiss my"
+      - run: echo ${{ inputs.trigger_repo }}
     # get docscrape chart code
     # set images to values.yaml
     # commit values.yaml back to chart repo

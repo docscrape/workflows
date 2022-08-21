@@ -40,6 +40,7 @@ jobs:
       - name: "Push chart with updated ${{ inputs.triggered_repo }} with tag: ${{ inputs.tag }}"
         uses: ad-m/github-push-action@master
         with:
+          repository: ${{ github.repository_owner }}/docscrape_chart
           github_token: ${{ secrets.DEPLOY_PAT }}
           branch: master
       

@@ -44,7 +44,7 @@ jobs:
       #     branch: master
 
       - name: Deploy
-        uses: WyriHaximus/github-action-helm3@v2
+        uses: WyriHaximus/github-action-helm3@master
         with:
           kubeconfig: '${{ secrets.KUBECONFIG_FILE }}'
           exec: >

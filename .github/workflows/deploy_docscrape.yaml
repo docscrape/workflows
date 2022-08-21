@@ -55,29 +55,31 @@ jobs:
       #     version: latest
       #     token: ${{ secrets.GITHUB_TOKEN }}
 
-      # - uses: Azure/k8s-set-context@v2
-      #   with:
-      #     kubeconfig: ${{ secrets.K }}
-
-      - name: Deploy
-        uses: deliverybot/helm@v1.5.0
+      - uses: Azure/k8s-set-context@v2
         with:
-          release: 'docscrape'
-          namespace: 'test'
-          chart: '.'
-          token: '${{ secrets.GITHUB_TOKEN }}'
-          helm: helm3
-          values: |
-            dockerconfigjson: ${{ secrets.DOCKERCONFIGJSON }}
-            post_search_engine.vk_login: ${{ secrets.POST_SEARCH_ENGINE_VK_LOGIN }}
-            post_search_engine.vk_password: ${{ secrets.POST_SEARCH_ENGINE_VK_PASSWORD }}
-            account_finder.fc_login: ${{ secrets.FC_LOGIN }}
-            account_finder.fc_password: ${{ secrets.FC_PASSWORD }}
-            seller.vk_login: ${{ secrets.SELLER_VK_LOGIN }}
-            seller.vk_password: ${{ secrets.SELLER_VK_PASSWORD }}
-            seller.vk_id_to_send_debug_reports_to: ${{ secrets.VK_ID_TO_SEND_DEBUG_REPORTS_TO }}
-            seller.billing_number: ${{ secrets.BILLING_NUMBER }}
-            seller.dev_mode: "true"
-          # value-files: "values.yaml"
-        env:
-          KUBECONFIG_FILE: ${{ secrets.KUBECONFIG_FILE }}
+          kubeconfig: ${{ secrets.KUBECONFIG_FILE }}
+      
+      - run: helm list --namespace=test
+
+      # - name: Deploy
+      #   uses: deliverybot/helm@v1.5.0
+      #   with:
+      #     release: 'docscrape'
+      #     namespace: 'test'
+      #     chart: '.'
+      #     token: '${{ secrets.GITHUB_TOKEN }}'
+      #     helm: helm3
+      #     values: |
+      #       dockerconfigjson: ${{ secrets.DOCKERCONFIGJSON }}
+      #       post_search_engine.vk_login: ${{ secrets.POST_SEARCH_ENGINE_VK_LOGIN }}
+      #       post_search_engine.vk_password: ${{ secrets.POST_SEARCH_ENGINE_VK_PASSWORD }}
+      #       account_finder.fc_login: ${{ secrets.FC_LOGIN }}
+      #       account_finder.fc_password: ${{ secrets.FC_PASSWORD }}
+      #       seller.vk_login: ${{ secrets.SELLER_VK_LOGIN }}
+      #       seller.vk_password: ${{ secrets.SELLER_VK_PASSWORD }}
+      #       seller.vk_id_to_send_debug_reports_to: ${{ secrets.VK_ID_TO_SEND_DEBUG_REPORTS_TO }}
+      #       seller.billing_number: ${{ secrets.BILLING_NUMBER }}
+      #       seller.dev_mode: "true"
+      #     # value-files: "values.yaml"
+      #   env:
+      #     KUBECONFIG_FILE: ${{ secrets.KUBECONFIG_FILE }}

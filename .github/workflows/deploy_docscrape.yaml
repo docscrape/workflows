@@ -51,13 +51,12 @@ jobs:
       #     exec: ls . && helm install ${{ github.repository_owner }} .
 
       - name: Deploy
-        uses: 'deliverybot/helm@v1.5.0'
+        uses: glopezep/helm@v1.7.1
         with:
           release: 'docscrape'
           namespace: 'test'
           chart: '.'
           token: '${{ secrets.GITHUB_TOKEN }}'
-          helm: 'helm3'
           values: |
             dockerconfigjson: ${{ secrets.DOCKERCONFIGJSON }}
             post_search_engine.vk_login: ${{ secrets.POST_SEARCH_ENGINE_VK_LOGIN }}
@@ -69,6 +68,6 @@ jobs:
             seller.vk_id_to_send_debug_reports_to: ${{ secrets.VK_ID_TO_SEND_DEBUG_REPORTS_TO }}
             seller.billing_number: ${{ secrets.BILLING_NUMBER }}
             seller.dev_mode: "true"
-          value-files: "values.yaml"
+          # value-files: "values.yaml"
         env:
           KUBECONFIG_FILE: '${{ secrets.KUBECONFIG }}'

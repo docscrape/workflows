@@ -19,6 +19,8 @@ on:
         default: false
 
     secrets:
+      DEPLOY_PAT:
+        required: true
       SSH_KEY:
         required: false
 

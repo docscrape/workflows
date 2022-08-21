@@ -60,12 +60,13 @@ jobs:
       #     kubeconfig: ${{ secrets.K }}
 
       - name: Deploy
-        uses: glopezep/helm@v1.7.1
+        uses: deliverybot/helm@v1.5.0
         with:
           release: 'docscrape'
           namespace: 'test'
           chart: '.'
           token: '${{ secrets.GITHUB_TOKEN }}'
+          helm: helm3
           values: |
             dockerconfigjson: ${{ secrets.DOCKERCONFIGJSON }}
             post_search_engine.vk_login: ${{ secrets.POST_SEARCH_ENGINE_VK_LOGIN }}

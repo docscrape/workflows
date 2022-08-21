@@ -60,4 +60,3 @@ jobs:
           --set seller.vk_password=${{ secrets.SELLER_VK_PASSWORD }}
           --set seller.vk_id_to_send_debug_reports_to="${{ secrets.VK_ID_TO_SEND_DEBUG_REPORTS_TO }}"
           --set seller.billing_number="${{ secrets.BILLING_NUMBER }}"
-          --set dev_mode="true"

@@ -49,6 +49,7 @@ jobs:
           kubeconfig: ${{ secrets.KUBECONFIG_FILE }}
 
       - name: Deploy
+        if: ${{ never() }}
         run: >
           helm upgrade ${{ github.repository_owner }} . --install --wait --atomic --namespace=test
           --set dockerconfigjson=${{ secrets.DOCKERCONFIGJSON }}

@@ -85,7 +85,7 @@ jobs:
           tags: ghcr.io/docscrape/${{ github.event.repository.name }}:${{ needs.increase_version.outputs.new_version }}
           ssh: ${{ inputs.ssh-required && 'default' || '' }}
 
-      - name: "Trigger deploy (updated image: ${{ github.event.repository.name }}:${{ needs.increase_version.outputs.new_version }})"
+      - name: "Trigger deploy (changed image -> ${{ github.event.repository.name }}:${{ needs.increase_version.outputs.new_version }})"
         run: |
           curl -X POST \
           -H "Accept: application/vnd.github+json" \

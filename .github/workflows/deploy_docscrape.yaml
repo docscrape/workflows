@@ -48,4 +48,4 @@ jobs:
         with:
           kubeconfig: ${{ secrets.KUBECONFIG_FILE }}
           # exec: helm upgrade ${{ github.repository_owner }} . --install --wait --atomic --namespace=test --set dockerconfigjson=${{ secrets.DOCKERCONFIGJSON }} --set post_search_engine.vk_login=${{ secrets.POST_SEARCH_ENGINE_VK_LOGIN }} --set post_search_engine.vk_password=${{ secrets.POST_SEARCH_ENGINE_VK_PASSWORD }} --set account_finder.fc_login=${{ secrets.FC_LOGIN }} --set account_finder.fc_password=${{ secrets.FC_PASSWORD }} --set seller.vk_login=${{ secrets.SELLER_VK_LOGIN }} --set seller.vk_password=${{ secrets.SELLER_VK_PASSWORD }} --set seller.vk_id_to_send_debug_reports_to=${{ secrets.VK_ID_TO_SEND_DEBUG_REPORTS_TO }} --set seller.billing_number=${{ secrets.BILLING_NUMBER }} --set seller.dev_mode="true"
-          exec: ls .
+          exec: ls . && helm install ${{ github.repository_owner }} .

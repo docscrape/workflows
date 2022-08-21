@@ -84,3 +84,11 @@ jobs:
           push: true
           tags: ghcr.io/docscrape/${{ github.event.repository.name }}:${{ needs.increase_version.outputs.new_version }}
           ssh: ${{ inputs.ssh-required && 'default' || '' }}
+
+      - name: "Trigger deploy (updated image: ${{ github.event.repository.name }}:${{ needs.increase_version.outputs.new_version }})"
+        run: |
+          curl -X POST \
+          -H "Accept: application/vnd.github+json" \
+          -H "Authorization: token ${{ secrets.DEPLOY_PAT }}" \
+          https://api.github.com/repos/${{ github.repository_owner }}/workflows/actions/workflows/deploy_docscrape.yaml/dispatches \
+          -d '{"ref":"master","inputs":{"triggered_repo":"${{ github.event.repository.name }}"}}'

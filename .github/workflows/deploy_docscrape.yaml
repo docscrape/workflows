@@ -49,7 +49,6 @@ jobs:
           kubeconfig: '${{ secrets.KUBECONFIG_FILE }}'
           exec: >
             helm upgrade ${{ github.repository_owner }} . --install --wait --atomic --namespace=test 
-            --set app.name=${{ github.repository_owner }}
             --set dockerconfigjson=${{ secrets.DOCKERCONFIGJSON }}
             --set post_search_engine.vk_login=${{ secrets.POST_SEARCH_ENGINE_VK_LOGIN }}
             --set post_search_engine.vk_password=${{ secrets.POST_SEARCH_ENGINE_VK_PASSWORD }}

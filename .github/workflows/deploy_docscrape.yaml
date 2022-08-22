@@ -1,0 +1,66 @@
+name: Deploy docscrape chart
+
+on:
+  workflow_dispatch:
+    inputs:
+      triggered_repo:
+        description: |
+          The repo that triggered deploy.
+          It also is an image
+        type: string
+        required: true
+      tag:
+        description: "The image tag"
+        type: string
+        required: true
+
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: prod
+    steps:
+      - name: Check out docscrape chart
+        uses: actions/checkout@master
+        with:
+          repository: ${{ github.repository_owner }}/docscrape_chart
+          token: ${{ secrets.DEPLOY_PAT }}
+      - run: git pull
+
+      - name: Update ${{ inputs.triggered_repo }} image tag in values.yaml
+        run: >
+          sed -i '/^${{ inputs.triggered_repo }}:/{n;s/image:.*/image: ghcr.io\/docscrape\/${{ inputs.triggered_repo }}:${{ inputs.tag }}/;}' values.yaml
+
+      - name: Prepare updated ${{ inputs.triggered_repo }} tag to push
+        run: |
+          if [[ `git status --porcelain` ]]; then
+            git config --global user.email `git log -n 1 --pretty=format:%ae`
+            git config --global user.name `git log -n 1 --pretty=format:%an`
+            git commit values.yaml -m "Use ${{ inputs.triggered_repo }} version ${{ inputs.tag }}"
+          fi
+
+      - name: "Push chart with updated ${{ inputs.triggered_repo }} with tag: ${{ inputs.tag }}"
+        uses: ad-m/github-push-action@master
+        with:
+          repository: ${{ github.repository_owner }}/docscrape_chart
+          github_token: ${{ secrets.DEPLOY_PAT }}
+          branch: master
+
+      - name: Connect to kubernetes cluster
+        uses: Azure/k8s-set-context@v2
+        with:
+          kubeconfig: ${{ secrets.KUBECONFIG_FILE }}
+
+      - name: Deploy
+        # if: ${{ !always() }}
+        run: >
+          helm upgrade ${{ github.repository_owner }} . --install --wait --atomic
+          --set dockerconfigjson="${{ secrets.DOCKERCONFIGJSON }}"
+          --set post_search_engine.vk_login="${{ secrets.POST_SEARCH_ENGINE_VK_LOGIN }}"
+          --set post_search_engine.vk_password="${{ secrets.POST_SEARCH_ENGINE_VK_PASSWORD }}"
+          --set account_finder.fc_login="${{ secrets.FC_LOGIN }}"
+          --set account_finder.fc_password="${{ secrets.FC_PASSWORD }}"
+          --set seller.vk_login="${{ secrets.SELLER_VK_LOGIN }}"
+          --set seller.vk_password="${{ secrets.SELLER_VK_PASSWORD }}"
+          --set seller.vk_id_to_send_debug_reports_to="${{ secrets.VK_ID_TO_SEND_DEBUG_REPORTS_TO }}"
+          --set seller.billing_number="${{ secrets.BILLING_NUMBER }}"

@@ -1,0 +1,133 @@
+name: "CI for stack: poetry, pre-commit, pytest"
+
+on:
+  workflow_call:
+    inputs:
+
+      python-versions:
+        description: >
+          The python versions to test in matrix
+          This is json array in string representation
+          Example: '[3.8, "3.9", "3.10.6"]'
+        type: string
+        required: false
+        default: '["3.10"]'
+
+      poetry-version:
+        type: string
+        required: false
+        default: 1.1.14
+
+      package-name:
+        description: >
+          The name of the python package against which the coverage will be counted
+        type: string
+        required: false
+        default: ${{ github.event.repository.name }}
+
+      tests-dir:
+        description: >
+          The tests folder against which the tests will be run
+        type: string
+        required: false
+        default: "tests"
+
+      ssh-required:
+        type: boolean
+        required: false
+        default: false
+
+      upload-to-gist-required:
+        type: boolean
+        required: false
+        default: false
+
+      gistID:
+        description: >
+          The gist id to upload coverage reports to
+        type: string
+        required: false
+
+    secrets:
+      SSH_KEY:
+        required: false
+      GIST_SECRET:
+        required: false
+
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+      - uses: pre-commit/action@v3.0.0
+
+
+  test:
+    runs-on: ubuntu-latest
+    name: test (python ${{ matrix.python-version }})
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ${{fromJson(inputs.python-versions)}}
+
+    steps:
+      - name: Install SSH Key
+        if: inputs.ssh-required
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.SSH_KEY }}
+          known_hosts: 'just-a-placeholder-so-we-dont-get-errors'
+      - name: Adding Known Hosts
+        if: inputs.ssh-required
+        run: ssh-keyscan -H github.com >> ~/.ssh/known_hosts
+
+      - uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install Poetry
+        uses: abatilo/actions-poetry@v2.1.0
+        with:
+          poetry-version: ${{ inputs.poetry-version }}
+
+      - name: Load Cached Dependencies
+        id: cached-poetry-dependencies
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/pypoetry/
+          key: ${{ runner.os }}-python${{ matrix.python-version }}-poetry-lock-${{ hashFiles('poetry.lock') }}
+
+      - name: Install dependencies
+        run: poetry install
+        if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+
+      # - name: Setup tmate session
+      #   uses: mxschmitt/action-tmate@v3
+
+      - name: Test with pytest
+        run: poetry run pytest --cov=${{ inputs.package-name }} --cov-report=term-missing:skip-covered --junitxml=pytest.xml ${{ inputs.tests-dir }} | tee pytest-coverage.txt
+
+      - name: Pytest coverage comment
+        id: coverage_comment
+        uses: MishaKav/pytest-coverage-comment@main
+        with:
+          pytest-coverage-path: ./pytest-coverage.txt
+          junitxml-path: ./pytest.xml
+
+      - name: Update coverage badge on gist  # TODO Move it as another job
+        if: |
+          inputs.upload-to-gist-required
+          && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+        uses: schneegans/dynamic-badges-action@v1.0.0
+        with:
+          auth: ${{ secrets.GIST_SECRET }}
+          gistID: ${{ inputs.gistID }}
+          filename: ${{ github.event.repository.name }}__${{ github.event.repository.default_branch }}.json
+          label: Coverage
+          message: ${{ steps.coverage_comment.outputs.coverage }}
+          color: ${{ steps.coverage_comment.outputs.color }}
+          namedLogo: python

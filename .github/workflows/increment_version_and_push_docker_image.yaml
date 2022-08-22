@@ -1,0 +1,96 @@
+name: CD (increase the app version and update docker image on ghcr.io)
+
+on:
+  workflow_call:
+    inputs:
+      poetry-version:
+        type: string
+        required: false
+        default: 1.1.14
+
+      branch:
+        type: string
+        required: false
+        default: ${{ github.ref }}
+
+      ssh-required:
+        type: boolean
+        required: false
+        default: false
+
+    secrets:
+      DEPLOY_PAT:
+        required: true
+      SSH_KEY:
+        required: false
+
+jobs:
+  increase_version:
+    runs-on: ubuntu-latest
+    outputs:
+      new_version: ${{ steps.increase_app_version.outputs.new_version }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - run: git pull
+
+      - uses: abatilo/actions-poetry@v2.1.0
+        with:
+          poetry-version: ${{ inputs.poetry-version }}
+
+      - name: Increase the app version if it's not updated
+        id: increase_app_version
+        run: |
+          if ! git diff ${{ github.event.before }}:pyproject.toml ${{ github.event.after }}:pyproject.toml | grep -e "[-|+]version = \"\([0-9]*\)\.\([0-9]*\)\.\([0-9]*\)\""
+          then
+              # Make the author of the last commit also the author of the current one
+              git config --global user.email `git log -n 1 --pretty=format:%ae`
+              git config --global user.name `git log -n 1 --pretty=format:%an`
+
+              OLD_VERSION=`poetry version -s`
+              poetry version patch
+              NEW_VERSION=`poetry version -s`
+              git commit pyproject.toml -m "Increase version from $OLD_VERSION to $NEW_VERSION"
+          fi
+          echo "::set-output name=new_version::`poetry version -s`"
+
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ inputs.branch }}
+
+
+  publish:
+    runs-on: ubuntu-latest
+    needs: [ increase_version ]
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: webfactory/ssh-agent@v0.5.4
+        if: inputs.ssh-required
+        with:
+          ssh-private-key: ${{ secrets.SSH_KEY }}
+
+      - uses: docker/setup-buildx-action@v1.6.0
+      - uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push docker image (tag ${{ needs.increase_version.outputs.new_version }})
+        uses: docker/build-push-action@v2.7.0
+        with:
+          push: true
+          tags: ghcr.io/docscrape/${{ github.event.repository.name }}:${{ needs.increase_version.outputs.new_version }}
+          ssh: ${{ inputs.ssh-required && 'default' || '' }}
+
+      - name: "Trigger deploy (changed image -> ${{ github.event.repository.name }}:${{ needs.increase_version.outputs.new_version }})"
+        run: >
+          curl -X POST
+          -H "Accept: application/vnd.github+json"
+          -H "Authorization: token ${{ secrets.DEPLOY_PAT }}"
+          https://api.github.com/repos/${{ github.repository_owner }}/workflows/actions/workflows/deploy_docscrape.yaml/dispatches
+          -d '{"ref":"master","inputs":{"triggered_repo":"${{ github.event.repository.name }}","tag":"${{ needs.increase_version.outputs.new_version }}"}}'

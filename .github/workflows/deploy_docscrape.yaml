@@ -54,7 +54,7 @@ jobs:
       - name: Deploy
         # if: ${{ !always() }}
         run: >
-          helm upgrade ${{ github.repository_owner }} . --install --wait --atomic --namespace=test
+          helm upgrade ${{ github.repository_owner }} . --install --wait --atomic
           --set dockerconfigjson="${{ secrets.DOCKERCONFIGJSON }}"
           --set post_search_engine.vk_login="${{ secrets.POST_SEARCH_ENGINE_VK_LOGIN }}"
           --set post_search_engine.vk_password="${{ secrets.POST_SEARCH_ENGINE_VK_PASSWORD }}"

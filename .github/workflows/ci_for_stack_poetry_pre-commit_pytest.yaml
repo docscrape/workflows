@@ -105,8 +105,8 @@ jobs:
         run: poetry install
         if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
 
-      # - name: Setup tmate session
-      #   uses: mxschmitt/action-tmate@v3
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
 
       - name: Test with pytest
         run: poetry run pytest --cov=${{ inputs.package-name }} --cov-report=term-missing:skip-covered --junitxml=pytest.xml ${{ inputs.tests-dir }} | tee pytest-coverage.txt

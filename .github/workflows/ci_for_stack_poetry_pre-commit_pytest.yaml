@@ -109,7 +109,10 @@ jobs:
         uses: mxschmitt/action-tmate@v3
 
       - name: Test with pytest
-        run: poetry run pytest --cov=${{ inputs.package-name }} --cov-report=term-missing:skip-covered --junitxml=pytest.xml ${{ inputs.tests-dir }} | tee pytest-coverage.txt
+        run: |
+          set -o pipefail  # To avoid the tee to rewrite the pytest exit code
+          poetry run pytest --cov=${{ inputs.package-name }} --cov-report=term-missing:skip-covered --junitxml=pytest.xml ${{ inputs.tests-dir }} | tee pytest-coverage.txt
+
 
       - name: Pytest coverage comment
         id: coverage_comment

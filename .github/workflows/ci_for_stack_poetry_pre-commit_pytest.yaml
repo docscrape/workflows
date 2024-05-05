@@ -8,15 +8,15 @@ on:
         description: >
           The python versions to test in matrix
           This is json array in string representation
-          Example: '[3.8, "3.9", "3.10.6"]'
+          Example: '["3.9", "3.10.6", "3.11"]'
         type: string
         required: false
-        default: '["3.10"]'
+        default: '["3.11"]'
 
       poetry-version:
         type: string
         required: false
-        default: 1.1.14
+        default: 1.7.1
 
       package-name:
         description: >
